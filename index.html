@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Felicidades CEI</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
+</head>
+
+<body>
+    <main class="scene " aria-label="Entorno inmersivo">
+        <div class="bg" aria-hidden="true"></div>
+        <canvas id="threejs-canvas"></canvas>
+        <div id="lyrics-overlay" class="apple-lyrics-overlay"></div>
+
+        <!-- <div class="floating-images">
+            <img src="./20230813_174033.jpg" class="floating" style="top: 20%; left: 15%;" />
+            <img src="./20230813_174033.jpg" class="floating" style="top: 40%; right: 20%;" />
+        </div> -->
+
+
+        <div class="topbar">
+            <span class="pill time-pill">
+                <span class="signal ok"></span>
+                <span class="time-display" id="ahora-hora">12:45</span>
+            </span>
+            <span class="pill altitude-pill">
+                <span class="signal"></span>
+                Altitud 34 m
+            </span>
+            <span class="pill weather-pill">
+                <span class="signal info"></span>
+                Clima 18°C
+            </span>
+            <span class="pill link-pill">
+                <span class="signal warn"></span>
+                Barakaldo
+            </span>
+        </div>
+
+        <!-- <div class="motivation">"Cada paso que das te acerca a tu meta."</div> -->
+        <div class="reticle"><span class="dot"></span></div>
+        <div class="central-albums">
+            <div class="albums-header">
+                <h2 class="albums-title">Lista de álbumes</h2>
+            </div>
+            <div class="albums-grid" id="albums-grid">
+                <!-- Los álbumes se generan dinámicamente -->
+            </div>
+        </div>
+        <aside class="telemetry music-area">
+            <div class="mac-title-bar">
+                <!-- <span class="mac-btn close"></span> -->
+                <span class="mac-btn minimize"></span>
+                <span class="mac-btn maximize"></span>
+            </div>
+            <div class="playlist-wrapper">
+                <!-- <h3>Lista de canciones</h3> -->
+                <ul id="playlist" class="playlist"></ul>
+                <button class="view-more-btn">Ver mas</button>
+            </div>
+
+        </aside>
+        <div class="bottom-panel">
+            <!-- Zona de reproducción tipo Vision Pro -->
+            <div class="vision-music-player">
+                <!-- <img id="cover-art" src="./im" alt="Cover del álbum" class="cover-art"> -->
+                <button id="prev-btn" class="player-btn">
+                    <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M6 19V5h2v14H6zm3.5-7L18 5v14l-8.5-7z" />
+                    </svg>
+                </button>
+                <button id="playpause-btn" class="player-btn">
+                    <svg id="icon-play" viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M8 5v14l11-7z" />
+                    </svg>
+                    <!-- Pause (oculto al inicio) -->
+                    <svg id="icon-pause" viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+
+                </button>
+                <button id="next-btn" class="player-btn">
+                    <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M16 5v14h-2V5h2zm-3.5 7L4 19V5l8.5 7z" />
+                    </svg>
+                </button>
+                <div class="cover-rect">
+                    <div class="progress-container">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <div class="time-info">
+                        <span id="current-time">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                </div>
+
+
+                <button id="lyrics-btn" class="player-btn">
+                    <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M4 4h16v12H5.17L4 17.17V4zm2 4v2h12V8H6zm0 4v2h8v-2H6z" />
+                    </svg>
+                </button>
+                <!-- <button id="queue-btn" class="player-btn">
+                    <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path d="M3 6h18v2H3V6zm0 5h12v2H3v-2zm0 5h18v2H3v-2z" />
+                    </svg>
+                </button> -->
+
+                <button id="volume-btn" class="player-btn">
+                    <!-- Icono volumen -->
+                    <svg id="icon-volume" viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path
+                            d="M3 10v4h4l5 5V5l-5 5H3zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                    <!-- Icono mute oculto -->
+                    <svg id="icon-mute" viewBox="0 0 24 24" fill="white" width="20" height="20" style="display:none;">
+                        <path
+                            d="M16 7.41L14.59 6 12 8.59 9.41 6 8 7.41 10.59 10 8 12.59 9.41 14 12 11.41 14.59 14 16 12.59 13.41 10z" />
+                        <path d="M3 10v4h4l5 5V5l-5 5H3z" />
+                    </svg>
+                </button>
+                <!-- <button class="apple-btn">Seleccione</button> -->
+
+                <input type="file" id="music-input" accept="audio/*" hidden>
+                <label for="music-input" class="apple-btn">Seleccione</label>
+                <audio id="audio-player" style="display:none;"></audio>
+
+
+            </div>
+        </div>
+
+        <!-- <div class="dock">
+            <button class="app"><span class="icon"></span><span class="label">Viajes</span></button>
+            <button class="app"><span class="icon"></span><span class="label">Momentos</span></button>
+            <button class="app"><span class="icon"></span><span class="label">Sueños</span></button>
+            <button class="app"><span class="icon"></span><span class="label">Música</span></button>
+        </div> -->
+        <section class="panel">
+            <div class="card">
+                <center>
+                    <h3>Happy Birthay</h3>
+                </center>
+                <button id="birthday-btn" class="apple-btn btncenter">Sorpresa</button>
+                <!-- <button onclick="window.toggleAutoPlay()" class="player-btn">
+                    <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 5-5v10zm4-5l5-5v10l-5-5z" />
+                    </svg>
+                </button> -->
+                <!-- <img src="./images/BARCA.png" height="50px" width="30px"/> -->
+
+                <!-- <input type="file" id="music-input" accept="audio/*"> -->
+
+                <!-- Reproductor oculto (sin controles nativos) -->
+                <!-- <audio id="audio-player" style="display:none;"></audio> -->
+
+                <!-- Botón personalizado -->
+                <!-- <button id="play-btn" style="margin-top:8px; font-size:20px; cursor:pointer;">
+                    ▶️
+                </button> -->
+            </div>
+
+            <div class="card">
+               
+                <div class="memories-grid">
+                    <!-- Opción 1: Con tu imagen (cambia la ruta) -->
+                    <div class="memory-card location">
+                        <div class="memory-header"
+                            style="background-image: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)), url('images/c24.jpeg'); background-size: cover; background-position: center;">
+                            <div class="memory-date">23 sept</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <center>
+                    <h3>Efectos visuales</h3>
+                </center><br>
+                <div class="effect-options pads-grid" id="effect-options">
+                    <div class="chip" data-effect="flower">Flower</div>
+                    <div class="chip" data-effect="hexagon">Hexagons</div>
+                    <div class="chip" data-effect="hexWave">Girasoles</div>
+                    <div class="chip" data-effect="fire"> Fire</div>
+                    <div class="chip" data-effect="hearts">Corazones</div> <!-- nuevo -->
+                    <div class="chip" data-effect="hexMaze"> Laberinto</div>
+
+
+                    <div class="chip" data-effect="auto">Auto</div>
+                </div>
+
+            </div>
+
+
+        </section>
+        <!-- Galería Vision Pro (agregar al final del body, antes de </main>) -->
+        <div id="vision-gallery" class="vision-gallery">
+            <div class="gallery-main">
+                <div class="gallery-header">
+                    <h2 class="gallery-title">Recuerdos</h2>
+                    <button class="gallery-close" id="gallery-close">
+                        <svg width="24" height="24" fill="white" viewBox="0 0 24 24">
+                            <path
+                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="gallery-viewer">
+                    <div class="gallery-loading" id="gallery-loading">
+                        <div class="loading-spinner"></div>
+                        <div>Cargando...</div>
+                    </div>
+
+                    <img id="gallery-image" class="gallery-image" src="" alt="Foto del recuerdo">
+
+                    <button class="gallery-nav prev " id="gallery-prev">
+                        <svg class="iconcen" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                            <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+                        </svg>
+                    </button>
+
+                    <button class="gallery-nav next " id="gallery-next">
+                        <svg class="iconcen" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="gallery-counter">
+                    <span id="current-index">1</span> de <span id="total-images">5</span>
+                </div>
+            </div>
+
+            <div class="gallery-sidebar">
+                <h3 class="sidebar-title">Vista previa</h3>
+                <div class="thumbnails-grid" id="thumbnails-grid">
+                    <!-- Los thumbnails se generan dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
+    <script src="js/audioVisualizer.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/karaoke.js"></script>
+    <script src="js/indicadores.js"></script>
+    <script src="js/navigation.js"></script>
+    <!-- <script src="js/autoplay.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('audio-player');
+            const playlistEl = document.getElementById('playlist');
+            const albumsGrid = document.getElementById('albums-grid');
+
+            // Lista de canciones con portada, archivo y duración
+            const songs = [
+                {
+                    id: 4,
+                    title: "Cumpleaños Feliz Carlagreta",
+                    file: "songs/cumpleaniosnorml.mp3",
+                    lyrics: "songs/soang1.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "2:58",
+                    albumId: 103
+                },
+                {
+                    id: 7,
+                    title: "Mañanitas a Carlagreta",
+                    file: "songs/manianitasvicentefernandez.mp3",
+                    lyrics: "songs/sondg1.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "2:58",
+                    albumId: 103
+                },
+                {
+                    id: 7,
+                    title: "Que Dios te Bendiga Carlagreta",
+                    file: "songs/quediostebendiga.mp3",
+                    lyrics: "songs/quediostebendiga.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "2:58",
+                    albumId: 103
+                },
+                {
+                    id: 8,
+                    title: "La más bella",
+                    file: "songs/lamasbeyacei.mp3",
+                    lyrics: "songs/lamasbeyacei.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "2:58",
+                    albumId: 103
+                },
+                {
+                    id: 1,
+                    title: "Melendi - Tu Jardín",
+                    file: "songs/melenditujard.mp3",
+                    lyrics: "songs/melenditujard.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "3:42",
+                    albumId: 101
+                },
+                {
+                    id: 2,
+                    title: "Melendi - La Promesa",
+                    file: "songs/melendilapromesa.mp3",
+                    lyrics: "songs/melendilapromesa.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "3:42",
+                    albumId: 101
+                },
+                {
+                    id: 3,
+                    title: "Grupo 5 Mix Chapis",
+                    file: "songs/grupo5loschapis.mp3",
+                    lyrics: "songs/grupo5loschapis.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "4:15",
+                    albumId: 102
+                },
+                // {
+                //     id: 5,
+                //     title: "Franco Rojas - Eres tú",
+                //     file: "songs/erestufrancorojas.mp3",
+                //     lyrics: "songs/erestufrancorojas.lrc",
+                //     cover: "images/iconartist.png",
+                //     duration: "2:58",
+                //     albumId: 105
+                // },
+                {
+                    id: 6,
+                    title: "Martin Garrix- Carry You",
+                    file: "songs/MGCarryyou.mp3",
+                    lyrics: "songs/MGCarryyou.lrc",
+                    cover: "images/iconartist.png",
+                    duration: "2:58",
+                    albumId: 104
+                },
+            ];
+
+            // Álbumes con id
+            const albums = [
+                {
+                    id: 0,
+                    title: "Ver todos",
+                    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%232ecc71'/%3E%3C/svg%3E"
+                },
+                {
+                    id: 101,
+                    title: "Melendi Hits",
+                    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23ff6b6b'/%3E%3C/svg%3E"
+                },
+                {
+                    id: 102,
+                    title: "Grupo 5 Mix",
+                    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23ff6b6b'/%3E%3C/svg%3E"
+                },
+                {
+                    id: 103,
+                    title: "Top Hits Internacional",
+                    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23ff6b6b'/%3E%3C/svg%3E"
+                },
+                {
+                    id: 104,
+                    title: "Martin Garrix",
+                    cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23ff6b6b'/%3E%3C/svg%3E"
+                }//,
+                // {
+                //     id: 105,
+                //     title: "Franco Rojas",
+                //     cover: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='%23ff6b6b'/%3E%3C/svg%3E"
+                // }
+            ];
+
+            // Karaoke overlay
+            // Karaoke overlay
+            const karaoke = new KaraokeOverlay(audio, 'lyrics-overlay', 'bottom-panel', 'lyrics-btn');
+
+            // AGREGAR ESTA LÍNEA para hacerlo global:
+            window.karaoke = karaoke;
+
+            // ========================================
+            // USAR LA NUEVA FUNCIÓN DE RENDERIZADO CON NAVEGACIÓN
+            // ========================================
+
+            // Al cargar la página: mostrar todas las canciones con navegación
+            window.renderPlaylistWithNavigation(songs);
+
+            // Renderizar álbumes
+            albums.forEach(album => {
+                const albumDiv = document.createElement('div');
+                albumDiv.classList.add('album-card');
+
+                albumDiv.innerHTML = `
+            <img src="${album.cover}" alt="${album.title}" class="album-cover">
+            <h3 class="album-name">${album.title}</h3>
+        `;
+
+                // Evento de selección
+                albumDiv.addEventListener('click', () => {
+                    // Quitar selección previa
+                    document.querySelectorAll('.album-card').forEach(el => el.classList.remove('selected'));
+                    albumDiv.classList.add('selected');
+
+                    if (album.id === 0) {
+                        // Mostrar todas las canciones
+                        window.renderPlaylistWithNavigation(songs);
+                        console.log("Mostrando todas las canciones");
+                    } else {
+                        // Filtrar canciones por albumId
+                        const songsInAlbum = songs.filter(song => song.albumId === album.id);
+                        window.renderPlaylistWithNavigation(songsInAlbum);
+                        console.log(`Álbum seleccionado: ${album.title}`);
+                    }
+                });
+
+                albumsGrid.appendChild(albumDiv);
+            });
+
+            // Botón ver más / ver menos
+            const toggleBtn = document.querySelector('.music-area .view-more-btn');
+            const albumsArea = document.querySelector('.central-albums');
+
+            if (toggleBtn && albumsArea) {
+                toggleBtn.addEventListener('click', () => {
+                    albumsArea.classList.toggle('visible');
+                    toggleBtn.textContent = albumsArea.classList.contains('visible') ? "Ver menos" : "Ver más";
+                });
+            }
+
+            // ========================================
+            // CONTROLES ADICIONALES CON TECLADO
+            // ========================================
+
+            document.addEventListener('keydown', (e) => {
+                // Solo activar si no estamos escribiendo en un input
+                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                    switch (e.code) {
+                        case 'ArrowRight':
+                        case 'MediaTrackNext':
+                            e.preventDefault();
+                            window.playNext();
+                            break;
+                        case 'ArrowLeft':
+                        case 'MediaTrackPrevious':
+                            e.preventDefault();
+                            window.playPrevious();
+                            break;
+                        case 'Space':
+                            e.preventDefault();
+                            document.getElementById('playpause-btn')?.click();
+                            break;
+                    }
+                }
+            });
+
+            // ========================================
+            // MOSTRAR INFO DE DEPURACIÓN
+            // ========================================
+
+            console.log('🎵 Reproductor inicializado con navegación');
+            console.log('📱 Controles de teclado:');
+            console.log('  ←/→ : Anterior/Siguiente');
+            console.log('  Espacio : Play/Pause');
+
+            // Función para mostrar estado actual
+            window.showPlaybackStatus = function () {
+                const info = window.getCurrentPlaybackInfo();
+                console.log('🎵 Estado actual:', info);
+            };
+        });
+
+        // ========================================
+        // FUNCIONES ADICIONALES DE UTILIDAD
+        // ========================================
+
+        // Función para cambiar canción por índice (mantenida para compatibilidad)
+        window.playListSong = function (index) {
+            window.playSongByIndex(index);
+        };
+
+        // Función para verificar efectos de audio
+        window.checkAudioEffects = function () {
+            const freqData = window.getFrequencyData();
+            if (freqData && freqData.length > 0) {
+                console.log('✅ Efectos visuales funcionando correctamente');
+                console.log('Datos de frecuencia:', freqData.slice(0, 5));
+                return true;
+            } else {
+                console.log('❌ No hay datos de frecuencia disponibles');
+                return false;
+            }
+        };
+
+
+        const aside = document.querySelector('.telemetry');
+        const minimizeBtn = document.querySelector('.mac-btn.minimize');
+        const maximizeBtn = document.querySelector('.mac-btn.maximize');
+
+        minimizeBtn.addEventListener('click', () => {
+            aside.classList.add('minimized');
+        });
+
+        maximizeBtn.addEventListener('click', () => {
+            aside.classList.remove('minimized');
+        });
+
+
+        /* records*/
+    </script>
+
+    <script>
+        // === GALERÍA VISION PRO ===
+        class VisionProGallery {
+            constructor() {
+                this.images = [
+                    // Cambia estas rutas por tus imágenes reales
+                    { src: 'images/hb24.jpeg', alt: 'Recuerdo 1' },
+                    { src: 'images/cab.jpeg', alt: 'Recuerdo 1' },
+                    { src: 'images/c24.jpeg', alt: 'Recuerdo 1' },
+                    
+                    { src: 'images/images.jpg', alt: 'Recuerdo 3' },
+                    { src: 'images/modoviaje.png', alt: 'Recuerdo 4' },
+                    { src: 'images/cei.jpg', alt: 'Recuerdo 2' },
+                    { src: 'images/mg25.jpeg', alt: 'Recuerdo 2' },
+
+                    { src: 'images/escalada.jpeg', alt: 'Recuerdo 2' },
+                    { src: 'images/escalando.jpeg', alt: 'Recuerdo 2' },
+                    //8 fotos
+                    { src: 'images/barcelonista.jpeg', alt: 'Recuerdo 2' },
+                    { src: 'images/tiaysobrin.jpeg', alt: 'Recuerdo 2' },
+                    { src: 'images/santa.jpeg', alt: 'Recuerdo 2' },
+                    { src: 'images/fueradvis.jpeg', alt: 'Recuerdo 2' },
+                    { src: 'images/go.jpeg', alt: 'Recuerdo 2' },
+                ];
+
+                this.currentIndex = 0;
+                this.isVisible = false;
+
+                // Esperar a que el DOM esté listo
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.init());
+                } else {
+                    this.init();
+                }
+            }
+
+            init() {
+                this.initializeElements();
+                this.setupEventListeners();
+                this.generateThumbnails();
+                this.connectMemoryCard();
+            }
+
+            initializeElements() {
+                this.gallery = document.getElementById('vision-gallery');
+                this.galleryImage = document.getElementById('gallery-image');
+                this.galleryClose = document.getElementById('gallery-close');
+                this.galleryPrev = document.getElementById('gallery-prev');
+                this.galleryNext = document.getElementById('gallery-next');
+                this.currentIndexEl = document.getElementById('current-index');
+                this.totalImagesEl = document.getElementById('total-images');
+                this.thumbnailsGrid = document.getElementById('thumbnails-grid');
+                this.galleryLoading = document.getElementById('gallery-loading');
+
+                this.totalImagesEl.textContent = this.images.length;
+            }
+
+            connectMemoryCard() {
+                // Conectar con tu tarjeta de recuerdos existente
+                const memoryCard = document.querySelector('.memory-card');
+                if (memoryCard) {
+                    memoryCard.addEventListener('click', () => {
+                        console.log('Abriendo galería...');
+                        this.open();
+                    });
+                }
+            }
+
+            setupEventListeners() {
+                this.galleryClose.addEventListener('click', () => this.close());
+                this.galleryPrev.addEventListener('click', () => this.previous());
+                this.galleryNext.addEventListener('click', () => this.next());
+
+                document.addEventListener('keydown', (e) => {
+                    if (!this.isVisible) return;
+
+                    switch (e.key) {
+                        case 'Escape': this.close(); break;
+                        case 'ArrowLeft': this.previous(); break;
+                        case 'ArrowRight': this.next(); break;
+                    }
+                });
+
+                this.gallery.addEventListener('click', (e) => {
+                    if (e.target === this.gallery) this.close();
+                });
+            }
+
+            generateThumbnails() {
+                this.thumbnailsGrid.innerHTML = '';
+
+                this.images.forEach((image, index) => {
+                    const thumbnail = document.createElement('div');
+                    thumbnail.className = 'thumbnail';
+                    thumbnail.innerHTML = `<img src="${image.src}" alt="${image.alt}">`;
+
+                    thumbnail.addEventListener('click', () => this.goToImage(index));
+                    this.thumbnailsGrid.appendChild(thumbnail);
+                });
+            }
+
+            open(startIndex = 0) {
+                this.currentIndex = startIndex;
+                this.isVisible = true;
+                this.gallery.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+                this.displayImage();
+                this.updateThumbnails();
+            }
+
+            close() {
+                this.isVisible = false;
+                this.gallery.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+
+            next() {
+                this.currentIndex = (this.currentIndex + 1) % this.images.length;
+                this.displayImage();
+                this.updateThumbnails();
+            }
+
+            previous() {
+                this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+                this.displayImage();
+                this.updateThumbnails();
+            }
+
+            goToImage(index) {
+                this.currentIndex = index;
+                this.displayImage();
+                this.updateThumbnails();
+            }
+
+            displayImage() {
+                const currentImage = this.images[this.currentIndex];
+
+                this.galleryLoading.style.display = 'block';
+                this.galleryImage.style.opacity = '0';
+
+                const img = new Image();
+                img.onload = () => {
+                    this.galleryLoading.style.display = 'none';
+                    this.galleryImage.src = currentImage.src;
+                    this.galleryImage.alt = currentImage.alt;
+                    this.galleryImage.style.opacity = '1';
+                };
+
+                img.onerror = () => {
+                    console.warn(`Error cargando: ${currentImage.src}`);
+                    this.galleryLoading.style.display = 'none';
+                    this.galleryImage.src = `https://picsum.photos/800/600?random=${this.currentIndex + 10}`;
+                    this.galleryImage.style.opacity = '1';
+                };
+
+                img.src = currentImage.src;
+                this.currentIndexEl.textContent = this.currentIndex + 1;
+            }
+
+            updateThumbnails() {
+                const thumbnails = this.thumbnailsGrid.querySelectorAll('.thumbnail');
+                thumbnails.forEach((thumb, index) => {
+                    thumb.classList.toggle('active', index === this.currentIndex);
+                });
+            }
+        }
+
+        // INICIALIZAR LA GALERÍA
+        document.addEventListener('DOMContentLoaded', () => {
+            window.visionGallery = new VisionProGallery();
+            console.log('Galería Vision Pro inicializada');
+        });
+    </script>
+    <script>
+        let wakeLock = null;
+    
+        async function activarWakeLock() {
+          try {
+            wakeLock = await navigator.wakeLock.request("screen");
+            console.log("✅ Pantalla bloqueada (no se apagará).");
+    
+            wakeLock.addEventListener("release", () => {
+              console.log("⚠️ Wake Lock liberado (la pantalla puede apagarse).");
+            });
+          } catch (err) {
+            console.error("❌ No se pudo activar Wake Lock:", err);
+          }
+        }
+    
+        // Activar al cargar
+        activarWakeLock();
+    
+        // Volver a activarlo si se pierde el foco (ej. minimizar app)
+        document.addEventListener("visibilitychange", () => {
+          if (wakeLock !== null && document.visibilityState === "visible") {
+            activarWakeLock();
+          }
+        });
+      </script>
+
+</body>
+
+</html>
